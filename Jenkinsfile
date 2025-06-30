@@ -1,19 +1,23 @@
-pipeline{
+pipeline {
     agent any
-    environment{
+
+    environment {
         DOCKER_IMAGE = 'samratsooraj/node-todo-app:latest'
     }
-    stages{
-        stage("code"){
-            steps{
-                git branch : 'main' , url : 'https://github.com/Samrat-Suraj/React_App_DevOps.git'
+
+    stages {
+        stage("Clone Code") {
+            steps {
+                git branch: 'main', url: 'https://github.com/Samrat-Suraj/React_App_DevOps.git'
             }
         }
-        stage("build"){
-            steps{
+
+        stage("Build Docker Image") {
+            steps {
                 sh 'docker build -t $DOCKER_IMAGE .'
             }
         }
+
         stage('Push to DockerHub') {
             steps {
                 withCredentials([usernamePassword(
@@ -26,8 +30,9 @@ pipeline{
                 }
             }
         }
-        stage("deploy"){
-            steps{
+
+        stage("Deploy with Docker Compose") {
+            steps {
                 sh 'docker-compose down || true'
                 sh 'docker-compose up -d --build'
             }
